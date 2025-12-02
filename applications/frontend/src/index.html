@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cloudmart</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { margin-bottom: 0.5rem; }
+    .row { display: flex; gap: 2rem; align-items: flex-start; }
+    .column { flex: 1; }
+    .product, .cart-item, .order-msg { border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Cloudmart Products</h1>
+
+  <div>
+    <label for="categorySelect">Filter by category:</label>
+    <select id="categorySelect">
+      <option value="">All</option>
+    </select>
+    <button id="filterBtn">Apply Filter</button>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h2>Products</h2>
+      <div id="products"></div>
+    </div>
+
+    <div class="column">
+      <h2>Shopping Cart</h2>
+      <div id="cart"></div>
+      <p><strong>Total:</strong> $<span id="cartTotal">0.00</span></p>
+      <button id="placeOrderBtn">Place Order</button>
+      <div id="orderMessage" class="order-msg"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
