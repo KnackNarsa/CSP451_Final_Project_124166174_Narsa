@@ -2,17 +2,15 @@ name: CI - Backend
 
 on:
   push:
-    branches: [ cloudmart ]
+    branches:
+      - cloudmart
   pull_request:
-    branches: [ cloudmart ]
+    branches:
+      - cloudmart
 
 jobs:
   backend-check:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: applications/backend
 
     steps:
       - name: Checkout repo
@@ -24,10 +22,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install backend dependencies
+        working-directory: applications/backend
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Sanity check: backend imports
+        working-directory: applications/backend
         run: |
           python -c "import app.main; print('Backend import OK')"
