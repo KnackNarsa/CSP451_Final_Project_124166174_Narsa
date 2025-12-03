@@ -133,7 +133,7 @@ jobs:
             --dns-name-label "$DNS_LABEL" \
             --restart-policy Always \
             --os-type Linux \
-              COSMOS_DB_NAME="$COSMOS_DB_NAME" \
+            --environment-variables "COSMOS_DB_NAME=${COSMOS_DB_NAME}" \
             --secure-environment-variables \
               COSMOS_ENDPOINT="$COSMOS_ENDPOINT" \
               COSMOS_KEY="$COSMOS_KEY" \
