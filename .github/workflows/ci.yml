@@ -52,6 +52,6 @@ jobs:
       - name: "Sanity check: index.html exists"
         working-directory: applications/frontend
         run: |
-          test -f index.html
+          test -f src/index.html
 
 
