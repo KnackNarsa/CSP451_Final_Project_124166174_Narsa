@@ -1,0 +1,135 @@
+name: CD - Cloudmart Production
+
+on:
+  workflow_run:
+    workflows: ["CI - Backend - Frontend"]
+    types: [completed]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/cloudmart:production
+      RG_NAME: Student-RG-1886175        
+      LOCATION: canadacentral           
+      ACI_NAME: cloudmart-prod
+      DNS_LABEL: cloudmart-124166174
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+
+      - name: Log in to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" \
+            | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build production image
+        run: |
+          docker build -f Dockerfile -t "$IMAGE_NAME" .
+
+      - name: Push image to Docker Hub
+        run: |
+          docker push "$IMAGE_NAME"
+
+
+      - name: Parse Azure credentials
+        run: |
+          echo '${{ secrets.AZURE_CREDENTIALS }}' > azure-creds.json
+          echo "AZURE_CLIENT_ID=$(jq -r .clientId azure-creds.json)" >> $GITHUB_ENV
+          echo "AZURE_CLIENT_SECRET=$(jq -r .clientSecret azure-creds.json)" >> $GITHUB_ENV
+          echo "AZURE_TENANT_ID=$(jq -r .tenantId azure-creds.json)" >> $GITHUB_ENV
+          echo "AZURE_SUBSCRIPTION_ID=$(jq -r .subscriptionId azure-creds.json)" >> $GITHUB_ENV
+
+      - name: Azure CLI login
+        run: |
+          az login --service-principal \
+            --username "$AZURE_CLIENT_ID" \
+            --password "$AZURE_CLIENT_SECRET" \
+            --tenant "$AZURE_TENANT_ID"
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+
+      - name: Ensure resource group exists
+        run: |
+          az group create -n "$RG_NAME" -l "$LOCATION"
+
+      - name: Create or update NSG with HTTP/HTTPS/SSH rules
+        run: |
+          NSG_NAME="${RG_NAME}-nsg"
+
+          # Create NSG if it doesn't exist
+          az network nsg create \
+            --resource-group "$RG_NAME" \
+            --name "$NSG_NAME" \
+            --location "$LOCATION" \
+            --output none
+
+          # AllowHTTP : port 80, priority 100
+          az network nsg rule create \
+            --resource-group "$RG_NAME" \
+            --nsg-name "$NSG_NAME" \
+            --name AllowHTTP \
+            --priority 100 \
+            --direction Inbound \
+            --access Allow \
+            --protocol Tcp \
+            --source-address-prefixes '*' \
+            --source-port-ranges '*' \
+            --destination-port-ranges 80 \
+            --output none
+
+          # AllowHTTPS : port 443, priority 110
+          az network nsg rule create \
+            --resource-group "$RG_NAME" \
+            --nsg-name "$NSG_NAME" \
+            --name AllowHTTPS \
+            --priority 110 \
+            --direction Inbound \
+            --access Allow \
+            --protocol Tcp \
+            --source-address-prefixes '*' \
+            --source-port-ranges '*' \
+            --destination-port-ranges 443 \
+            --output none
+
+          # AllowSSH : port 22, priority 120
+          az network nsg rule create \
+            --resource-group "$RG_NAME" \
+            --nsg-name "$NSG_NAME" \
+            --name AllowSSH \
+            --priority 120 \
+            --direction Inbound \
+            --access Allow \
+            --protocol Tcp \
+            --source-address-prefixes '*' \
+            --source-port-ranges '*' \
+            --destination-port-ranges 22 \
+            --output none
+
+
+      - name: Deploy Azure Container Instance
+        run: |
+          # If an instance with this name already exists, delete it first
+          if az container show -g "$RG_NAME" -n "$ACI_NAME" --only-show-errors &>/dev/null; then
+            az container delete -g "$RG_NAME" -n "$ACI_NAME" --yes --only-show-errors
+          fi
+
+          az container create \
+            --resource-group "$RG_NAME" \
+            --name "$ACI_NAME" \
+            --image "$IMAGE_NAME" \
+            --cpu 1 \
+            --memory 1.5 \
+            --ports 80 \
+            --ip-address Public \
+            --dns-name-label "$DNS_LABEL" \
+            --restart-policy Always
+
+      - name: Show public URL
+        run: |
+          echo "Cloudmart is deploying at:"
+          echo "  http://${DNS_LABEL}.${LOCATION}.azurecontainer.io"
