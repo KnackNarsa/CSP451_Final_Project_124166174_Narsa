@@ -128,6 +128,7 @@ jobs:
             --ip-address Public \
             --dns-name-label "$DNS_LABEL" \
             --restart-policy Always
+            --os-type Linux
 
       - name: Show public URL
         run: |
