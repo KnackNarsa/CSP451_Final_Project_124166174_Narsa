@@ -31,3 +31,27 @@ jobs:
         working-directory: applications/backend
         run: |
           python -m py_compile app/main.py app/database.py
+
+  frontend-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: "Sanity check: frontend JS syntax"
+        working-directory: applications/frontend
+        run: |
+          node --check src/app.js
+
+      - name: "Sanity check: index.html exists"
+        working-directory: applications/frontend
+        run: |
+          test -f index.html
+
+
