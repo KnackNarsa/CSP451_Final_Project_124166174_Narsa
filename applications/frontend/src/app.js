@@ -11,7 +11,7 @@ const filterBtn = document.getElementById("filterBtn");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
 const orderMessageDiv = document.getElementById("orderMessage")
 
-// cache products so we can look up name/price for cart
+// cache products to look up name/price for cart
 let productsById = {};
 
 async function fetchJSON(url, options = {}) {
@@ -92,7 +92,7 @@ async function loadCart() {
 
 
 async function addToCart(productId) {
-  const quantity = 1; // simple demo: always add 1
+  const quantity = 1; 
 
   const payload = {
     id: `cart-${Date.now()}`,
@@ -178,7 +178,6 @@ async function placeOrder() {
 }
 
 
-  // You *could* clear the cart here by DELETE-ing items, but not required for screenshots
 
 // Wire up events
 filterBtn.addEventListener("click", () => {
