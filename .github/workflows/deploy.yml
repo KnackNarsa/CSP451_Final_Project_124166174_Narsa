@@ -13,7 +13,7 @@ jobs:
     env:
       IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/cloudmart:production
       RG_NAME: Student-RG-1886175        
-      LOCATION: canadacentral           
+      LOCATION: canadaeast           
       ACI_NAME: cloudmart-prod
       DNS_LABEL: cloudmart-124166174
 
