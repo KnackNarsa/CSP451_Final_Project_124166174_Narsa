@@ -132,7 +132,12 @@ jobs:
             --ip-address Public \
             --dns-name-label "$DNS_LABEL" \
             --restart-policy Always \
-            --os-type Linux
+            --os-type Linux \
+              COSMOS_DB_NAME="$COSMOS_DB_NAME" \
+            --secure-environment-variables \
+              COSMOS_ENDPOINT="$COSMOS_ENDPOINT" \
+              COSMOS_KEY="$COSMOS_KEY" \
+            --command-line "uvicorn app.main:app --host 0.0.0.0 --port 80"
 
       - name: Show public URL
         run: |
