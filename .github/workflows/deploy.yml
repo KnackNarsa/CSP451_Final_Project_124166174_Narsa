@@ -112,6 +112,10 @@ jobs:
 
 
       - name: Deploy Azure Container Instance
+        env:
+          COSMOS_ENDPOINT: ${{ secrets.COSMOS_ENDPOINT }}
+          COSMOS_KEY: ${{ secrets.COSMOS_KEY }}
+          COSMOS_DB_NAME: cloudmart
         run: |
           # If an instance with this name already exists, delete it first
           if az container show -g "$RG_NAME" -n "$ACI_NAME" --only-show-errors &>/dev/null; then
