@@ -1,5 +1,7 @@
-// Change this if your backend runs elsewhere
-const API_BASE = "http://localhost:8000";
+// old (for dev)
+//const API_BASE = "http://localhost:8000";
+
+const API_BASE = window.location.origin;
 
 const productsDiv = document.getElementById("products");
 const cartDiv = document.getElementById("cart");

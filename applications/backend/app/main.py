@@ -1,11 +1,13 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
 from . import database as db
 
 app = FastAPI()
-
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 # Allow frontend to call the API
 
@@ -54,10 +56,10 @@ class Order(BaseModel):
 
 # ---------- HTML homepage ----------
 
-@app.get("/", response_class=str)
-def homepage():
-    # later replace with real HTML/template
-    return "<h1>Cloudmart</h1><p>Product catalog UI will go here.</p>"
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    return FileResponse("static/index.html")
+
 
 # ---------- /health ----------
 
