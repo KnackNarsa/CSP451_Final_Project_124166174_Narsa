@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  cloudmart:
+    container_name: cloudmart-app
+    build:
+      context: ..
+      dockerfile: Dockerfile  
+    image: cloudmart-prod        
+    ports:
+      - "80:80"                  
+    env_file:
+      - .env                     
+    restart: unless-stopped
