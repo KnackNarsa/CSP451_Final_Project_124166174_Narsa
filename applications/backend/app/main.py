@@ -129,7 +129,6 @@ async def delete_cart_item(item_id: str, user_id: str = "demo"):
     try:
         db.delete_cart_item(item_id, user_id)
     except Exception:
-        # keep it simple for the assignment
         raise HTTPException(status_code=404, detail="Cart item not found")
     return {"status": "deleted"}
 # ---------- Orders ----------
