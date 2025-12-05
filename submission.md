@@ -2638,7 +2638,7 @@ content-type: application/json
 | Docker Hub Integration | ✅ | dcjoker/cloudmart-api with tags |
 | GitHub Actions CI | ✅ | Test backend, frontend, build images |
 | GitHub Actions CD | ✅ | Push to Docker Hub, deploy to Azure |
-| RESTful API | ✅ | 9 endpoints functional |
+| RESTful API | ✅ | 11 endpoints functional |
 | Frontend UI | ✅ | Product catalog, cart, checkout |
 | Documentation | ✅ | Complete submission.md |
 
@@ -2656,4 +2656,5 @@ content-type: application/json
 
 *Submitted by: Student 1890084*  
 *Course: CSP451NIA - Cloud Computing*  
+
 *Seneca College - Fall 2025*
